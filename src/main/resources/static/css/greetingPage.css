@@ -1,0 +1,70 @@
+table {
+    margin: 0 auto;
+    width: 60%;
+    background-color: #FFFFFF;
+    border-spacing: 20px;
+    border: 1px solid;
+    border-radius: 15px;
+}
+
+@media (max-width: 1030px) and (min-width: 813px) {
+    body {
+        padding: 0 auto;
+        margin: 0 auto;
+        font-size: 13px;
+    }
+
+    th {
+        font-size: 13px;
+    }
+
+    table {
+        width: 100%;
+        border-spacing:0;
+    }
+}
+
+@media (max-width: 812px) {
+
+    body {
+        padding: 0 auto;
+        margin: 0 auto;
+        font-size: 10px;
+    }
+
+    th {
+        font-size: 10px;
+    }
+    table {
+        width: 100%
+    }
+}
+
+td, th {
+    border: 1px solid;
+    width: 15%;
+    text-align: center
+}
+
+#error_row {
+    background: #FA8072;
+}
+
+th {
+    border-radius: 15px;
+    border: 1px solid;
+    width: 25%;
+    background-color: #888888;
+    padding: 1.5%;
+    font-family: monospace;
+    font-size: 22px;
+    color: #000000;
+}
+
+#group:hover::after {
+    content: " | Программная инженерия"
+}
+
+#var:hover::before {
+    content: "Вариант "
+}

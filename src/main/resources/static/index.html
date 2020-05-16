@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>lab4</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <link rel="stylesheet" href="css/mainPage.css">
+</head>
+<body>
+<script>
+    req = new XMLHttpRequest();
+    req.open("GET", "/getUsername", false);
+    req.send(null);
+    if (req.status === 500)
+        window.location.replace("/");
+</script>
+<div id="vue">
+    <table class="checkbox">
+        <tr>
+            <td colspan="3">
+                Вы вошли как: {{username}}
+            </td>
+            <td colspan="3">
+                <label :style="{color:activeColor}">
+                    {{warning}}
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <a href="/exit">Разлогиниться</a>
+            </td>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <canvas id="canvas" @click="checkCanvas" width="300px" height="300px"></canvas>
+                <figcaption>Area</figcaption>
+            </td>
+            <td colspan="3">
+                <form onsubmit="return app.check();">
+                    <table>
+                        <tr>
+                            <td>
+                                Выберите X
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="checkbox" @click="checkBox" v-model="x" value="-5">-5
+                                <input type="checkbox" @click="checkBox" v-model="x" value="-4">-4
+                                <input type="checkbox" @click="checkBox" v-model="x" value="-3">-3
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="checkbox" @click="checkBox" v-model="x" value="-2">-2
+                                <input type="checkbox" @click="checkBox" v-model="x" value="-1">-1
+                                <input type="checkbox" @click="checkBox" v-model="x" value="0">0
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="checkbox" @click="checkBox" v-model="x" value="1">1
+                                <input type="checkbox" @click="checkBox" v-model="x" value="2">2
+                                <input type="checkbox" @click="checkBox" v-model="x" value="3">3
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label id="R">
+                                    Выберите радиус</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input v-model="r" @click="redraw" type="checkbox" value="-5">-5
+                                <input v-model="r" @click="redraw" type="checkbox" value="-4">-4
+                                <input v-model="r" @click="redraw" type="checkbox" value="-3">-3
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input v-model="r" @click="redraw" type="checkbox" value="-2">-2
+                                <input v-model="r" @click="redraw" type="checkbox" value="-1">-1
+                                <input v-model="r" @click="redraw" type="checkbox" value="0">0
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input v-model="r" @click="redraw" type="checkbox" value="1">1
+                                <input v-model="r" @click="redraw" type="checkbox" value="2">2
+                                <input v-model="r" @click="redraw" type="checkbox" value="3">3
+                            </td>
+                        <tr>
+                            <td>
+                                <input type="button" value="Проверить" @click="check">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>
+                                    Введите Y</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="text" @input="checkText" @change="ajaxCheckText" v-model="y" maxlength="25"
+                                       placeholder="(-5...3)">
+                            </td>
+                        </tr>
+
+                    </table>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <table>
+                    <thead>
+                    <tr>
+                        <td colspan="6">
+                            <label>
+                                История запросов
+                            </label>
+                            <button @click="clearHistory">Очистить историю</button>
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            X
+                        </th>
+                        <th>
+                            Y
+                        </th>
+                        <th>
+                            R
+                        </th>
+                        <th>
+                            Попадание
+                        </th>
+                        <th>
+                            Время запроса
+                        </th>
+                        <th>
+                            Владелец
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody id="result">
+                    <tr v-for="point in list">
+                        <td> {{point.x}}</td>
+                        <td> {{point.y}}</td>
+                        <td> {{point.r}}</td>
+                        <td> {{point.hit}}</td>
+                        <td> {{point.stringTime}}</td>
+                        <td> {{point.username}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script type="text/javascript">
+    window.list = [];
+    var app = new Vue({
+        el: '#vue',
+        data: {
+            r: [],
+            y: undefined,
+            x: [],
+            list: window.list,
+            canvasY: undefined,
+            canvasX: undefined,
+            offset: new Date().getTimezoneOffset(),
+            warning: "Введите координаты точки",
+        },
+        computed: {
+            activeColor: function () {
+                switch (this.warning) {
+                    case "X выбран":
+                    case "Y введен верно":
+                    case "Радиус выбран верно":
+                    case "Проверка успешно завершена!":
+                        return "lime";
+                    case "Введите Y":
+                    case "Введите координаты точки":
+                    case "Введите X":
+                    case "Введите радиус":
+                        return "black";
+                    default:
+                        return "red";
+                }
+            },
+            username: function () {
+                let req = new XMLHttpRequest();
+                req.open("GET", "/getUsername", false);
+                req.send(null);
+                return req.responseText;
+            },
+        },
+        methods: {
+            clearHistory: function () {
+                let req = new XMLHttpRequest();
+                req.open("DELETE", "/clearHistory");
+                req.send(null);
+                req.onload = () => {
+                    this.list = [];
+                    window.list = [];
+                    clearCanvas();
+                    drawArea(this.r[this.r.length - 1]);
+                    drawAxis();
+                }
+
+            },
+            checkBox: function () {
+                setTimeout(() => {
+                    this.warning = this.x.length !== 0 ? "X выбран" : "Введите X";
+                }, 0.2);
+            },
+            checkText: function () {
+                _y = this.y;
+                if (isNaN(_y))
+                    this.warning = "Y должен быть числом!";
+                else if (_y.length < 8) {
+                    if (_y.length === 0)
+                        this.warning = "Введите Y";
+                    else if (!(_y < 3 && _y > -5))
+                        this.warning = "Y должен быть меньше 3 и больше -5!";
+                    else
+                        this.warning = "Y введен верно";
+                }
+            },
+            ajaxCheckText: function () {
+                _y = this.y;
+                if (_y.length > 7 && !isNaN(_y)) {
+                    let req = new XMLHttpRequest();
+                    req.open("GET", "/checkText?y=" + _y);
+                    req.send(null);
+                    req.onload = () => {
+                        let text = req.responseText;
+                        if (text !== "true")
+                            this.warning = "Y должен быть меньше 3 и больше -5!";
+                        else this.warning = "Y введен верно"
+                    };
+                }
+            },
+            check: function () {
+                this.ajax(this.x, this.y);
+                return false;
+            },
+            checkCanvas: function (event) {
+                this.canvasX = (event.offsetX - canvas.width / 2) / 25;
+                this.canvasY = (event.offsetY - canvas.height / 2) / (-25);
+                if (this.canvasX >= -5 && this.canvasX <= 3 && this.canvasY > -5 && this.canvasY < 3)
+                    this.ajax([this.canvasX], this.canvasY);
+            },
+            ajax: function (x, y, r = this.r, saveable = true) {
+                this.warning = "";
+                if (r.length === 0) {
+                    this.warning += "Вы не выбрали радиус!\n";
+                    this.drawPointsFromList(this.list, true);
+
+                }
+                for (let a of r)
+                    if (a < 0) {
+                        this.warning += "Вы выбрали отрицательный радиус!\n";
+                        this.r = [];
+                        this.drawPointsFromList(this.list, true);
+                        break;
+                    }
+                if (y === undefined || y === "")
+                    this.warning += "Y не выбран!\n";
+                if (x.length === 0)
+                    this.warning += "X не выбран!";
+                if (this.warning.length !== 0)
+                    return;
+                if (saveable)
+                    this.warning = "Проверка успешно завершена!";
+                else this.warning = "Радиус выбран верно";
+                $.ajax({
+                    url: "/check",
+                    data: {x: x, y: y, r: r, offset: this.offset, saveable: saveable},
+                    type: "POST",
+                    mimeType: "application/json",
+                    success: function (data) {
+                        for (let l = 0; JSON.parse(data[l]) !== undefined; l++) {
+                            let date = JSON.parse(data[l]);
+                            if (saveable)
+                                window.list.push(date);
+                            drawPoint(date.x, date.y, date.hit === "Попадание" ? "lime" : "red");
+                        }
+                    },
+                });
+                this.list = window.list;
+            },
+            drawPointsFromList: function (list, badRequest = false) {
+                for (let point of list)
+                    drawPoint(point.x, point.y, point.hit === "Попадание" && !badRequest ? "lime" : "red");
+            },
+            redraw: function () {
+                setTimeout(() => {
+                    let lastRadius = this.r[this.r.length - 1];
+                    clearCanvas();
+                    if (lastRadius > 0)
+                        drawArea(lastRadius);
+                    drawAxis();
+                    for (let point of this.list)
+                        this.ajax([point.x], point.y, lastRadius === undefined ? [] : [lastRadius], false);
+                }, 0.2)
+            },
+        }
+    });
+    $.ajax({
+        url: "/getHistory",
+        mimeType: "application/json",
+        success: function (data) {
+            for (let l = 0; JSON.parse(data[l]) !== undefined; l++) {
+                let date = JSON.parse(data[l]);
+                console.log(date);
+                window.list.push(date);
+                drawPoint(date.x, date.y, "red");
+            }
+        }
+    });
+
+</script>
+<script src="js/canvas.js" type="text/javascript"></script>
+</body>
+</html>

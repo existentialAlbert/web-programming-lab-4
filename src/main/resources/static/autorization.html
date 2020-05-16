@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Lab 4</title>
+    <meta http-equiv="Content-Type" name="text/html">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <link rel="stylesheet" href="css/greetingPage.css"/>
+</head>
+<body style="background-image: url(css/images/bg5.jpg)">
+<div id="vue">
+    <table>
+        <tr>
+            <th>Выполнил: Безвинный Альберт Игоревич</th>
+            <th id="group">Группа P3214</th>
+            <th id="var">218531</th>
+            <th id="time-container">
+            </th>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td><label>Войдите:</label></td>
+        </tr>
+        <tr>
+            <td>
+                <form id="login" method="get">
+                    <label>Введите ваш логин
+                        <input type="text" required v-model="username" maxlength="18">
+                    </label>
+                    <br>
+                    <label>Введите пароль
+                        <input type="password" required v-model="password" maxlength="25">
+                    </label>
+                    <br>
+                    <input type="button" @click="login" value="Авторизоваться">
+                </form>
+            </td>
+        </tr>
+        <tr id="error_row">
+            <td>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Или зарегистрируйтесь:</label>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <form id="register" method="get">
+                    <label>Введите ваш логин
+                        <input type="text" required v-model="registerLogin" maxlength="18">
+                    </label>
+                    <br>
+                    <label>Введите пароль
+                        <input type="password" required v-model="registerPassword" maxlength="25">
+                    </label>
+                    <br>
+                    <input type="button" @click="register" value="Зарегистрироваться">
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
+<script type="text/javascript">
+    var app = new Vue({
+        el: "#vue",
+        data: {
+            username: undefined,
+            password: undefined,
+            registerPassword: undefined,
+            registerLogin: undefined,
+        },
+        methods: {
+            register: function () {
+                this.ajax("register", {
+                    username: this.registerLogin,
+                    password: this.registerPassword
+                });
+            },
+            login: function () {
+                this.ajax("login", {
+                    username: this.username,
+                    password: this.password
+                });
+            },
+            ajax: function (url, data, method = "POST") {
+                $.ajax({
+                    url: "/" + url,
+                    method: method,
+                    data: {name: data.username, password: data.password},
+                    mimeType: "text/html",
+                    success: function (data) {
+                        console.log(data);
+                        if (data === "true")
+                            window.location.replace("/main");
+                        else {
+                            document.getElementById("error_row").children[0].innerText = data;
+                            data.username = undefined;
+                            data.password = undefined;
+                        }
+                    }
+                })
+            }
+        },
+    })
+</script>
+<script src="js/clock.js"></script>
+</body>
+</html>
