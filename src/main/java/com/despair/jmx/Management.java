@@ -22,14 +22,17 @@ public class Management extends NotificationBroadcasterSupport implements Manage
             int count = points.size();
             int countWrongOnes = 0;
             int inRow = 0;
+            int seq = 0;
             for (Point point : points) {
                 if (point.isHit().equals("Промах")) {
                     countWrongOnes++;
                     inRow++;
                 } else inRow = 0;
-                if (inRow > 1)
+                if (inRow > 1) {
                     sendNotification(new Notification("2 misses in a row", this,
-                            0, System.currentTimeMillis(), "This person missed 2 times in a row!"));
+                            seq++, System.currentTimeMillis(), "This person missed 2 times in a row!"));
+                    inRow = 0;
+                }
             }
             return "Всего точек: " + count + "\n" +
                     "Промахов: " + countWrongOnes;
