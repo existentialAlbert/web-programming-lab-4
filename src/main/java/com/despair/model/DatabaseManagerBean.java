@@ -4,6 +4,7 @@ import com.despair.repositories.PointRepository;
 import com.despair.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.context.annotation.SessionScope;
@@ -14,7 +15,6 @@ import java.util.Optional;
 @Component
 public class DatabaseManagerBean {
     @Bean
-    @SessionScope
     public DatabaseManagerBean databaseManager() {
         return new DatabaseManagerBean();
     }
@@ -29,7 +29,7 @@ public class DatabaseManagerBean {
         return pointRepository.findAllByUsernameOrderByTime(user.getUsername());
     }
     public List<Point> getPoints(String username) {
-        return pointRepository.findAllByUsernameOrderByTime(user.getUsername());
+        return pointRepository.findAllByUsernameOrderByTime(username);
     }
 
 

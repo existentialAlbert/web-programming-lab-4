@@ -5,10 +5,12 @@ import com.despair.model.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.management.Notification;
+import javax.management.NotificationBroadcasterSupport;
 import java.util.List;
 
 @Component
-public class Management implements ManagementMBean {
+public class Management extends NotificationBroadcasterSupport implements ManagementMBean {
     @Autowired
     private DatabaseManagerBean databaseManager;
 
@@ -26,12 +28,12 @@ public class Management implements ManagementMBean {
                     inRow++;
                 } else inRow = 0;
                 if (inRow > 1)
-                    continue;
+                    sendNotification(new Notification("2 misses in a row", this,
+                            0, System.currentTimeMillis(), "This person missed 2 times in a row!"));
             }
             return "Всего точек: " + count + "\n" +
                     "Промахов: " + countWrongOnes;
-        }catch (NullPointerException e)
-        {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
         return "";
