@@ -28,6 +28,10 @@ public class DatabaseManagerBean {
     public List<Point> getPoints() {
         return pointRepository.findAllByUsernameOrderByTime(user.getUsername());
     }
+    public List<Point> getPoints(String username) {
+        return pointRepository.findAllByUsernameOrderByTime(user.getUsername());
+    }
+
 
     public void add(Point p) {
         p.setUsername(user.getUsername());

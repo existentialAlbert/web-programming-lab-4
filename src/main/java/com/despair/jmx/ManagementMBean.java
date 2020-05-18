@@ -1,5 +1,5 @@
 package com.despair.jmx;
 
-public interface DatabaseManagerMBean {
+public interface ManagementMBean {
     String getUserPoints(String username);
 }
