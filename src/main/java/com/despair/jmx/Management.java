@@ -18,7 +18,6 @@ public class Management extends NotificationBroadcasterSupport implements Manage
     public String getUserPoints(String username) {
         try {
             List<Point> points = databaseManager.getPoints(username);
-            System.out.println(points);
             int count = points.size();
             int countWrongOnes = 0;
             int inRow = 0;
